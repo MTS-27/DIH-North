@@ -15,32 +15,22 @@ export default function PrayerTable() {
   const [currentTime, setCurrentTime] = useState("");
   const [currentDate, setCurrentDate] = useState("");
 
-  // Helper function to add minutes to a "HH:MM" string for Jama'ah times
-  const addMinutes = (timeStr, minsToAdd) => {
-    if (!timeStr || timeStr === "--:--") return "--:--";
-    const [h, m] = timeStr.split(':').map(Number);
-    const date = new Date();
-    date.setHours(h, m + minsToAdd, 0);
-    return date.toTimeString().slice(0, 5);
-  };
-
   useEffect(() => {
-    // Fetch live prayer times
+    // Fetch live prayer times from London Prayer Times API
     const fetchPrayerTimes = async () => {
       try {
-        const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=London&country=UK');
+        // Format date to YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
+        const res = await fetch(`https://www.londonprayertimes.com/api/times/?format=json&key=71664292-21c9-4049-9aa8-34f3c6ecf96b&24hours=true&date=${today}`);
         const data = await res.json();
         
-        if (data && data.code === 200) {
-          const timings = data.data.timings;
-          
-          // Applying standard offsets for Jama'ah (congregation) times based on start times.
+        if (data && data.fajr) {
           setPrayerTimes([
-            { name: "Fajr", start: timings.Fajr, jamaah: addMinutes(timings.Fajr, 15) },
-            { name: "Zuhr", start: timings.Dhuhr, jamaah: addMinutes(timings.Dhuhr, 15) },
-            { name: "Asr", start: timings.Asr, jamaah: addMinutes(timings.Asr, 15) },
-            { name: "Maghrib", start: timings.Maghrib, jamaah: timings.Maghrib },
-            { name: "Isha", start: timings.Isha, jamaah: addMinutes(timings.Isha, 15) },
+            { name: "Fajr", start: data.fajr, jamaah: data.fajr_jamat },
+            { name: "Zuhr", start: data.dhuhr, jamaah: data.dhuhr_jamat },
+            { name: "Asr", start: data.asr, jamaah: data.asr_jamat },
+            { name: "Maghrib", start: data.magrib, jamaah: data.magrib_jamat },
+            { name: "Isha", start: data.isha, jamaah: data.isha_jamat },
           ]);
         }
       } catch (error) {
