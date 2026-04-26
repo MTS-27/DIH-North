@@ -51,8 +51,8 @@ export default function JumuahAnnouncement() {
                       <Users className="w-6 h-6 text-brand-gold" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold">Sisters</h3>
-                      <p className="text-white/80 text-lg">Designated prayer space is available for sisters.</p>
+                      <h3 className="text-xl font-bold">Brothers & Sisters</h3>
+                      <p className="text-white/80 text-lg">Designated prayer space is available for sisters. <br> Please Bring Your Own Prayer Mats.</p>
                     </div>
                   </div>
                 </div>
