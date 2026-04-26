@@ -52,7 +52,7 @@ export default function JumuahAnnouncement() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold">Brothers & Sisters</h3>
-                      <p className="text-white/80 text-lg">Designated prayer space is available for sisters. <br> Please Bring Your Own Prayer Mats.</p>
+                      <p className="text-white/80 text-lg">Designated prayer space is available for sisters. <br/> Please Bring Your Own Prayer Mats.</p>
                     </div>
                   </div>
                 </div>
