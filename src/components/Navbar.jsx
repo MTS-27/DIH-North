@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,17 +19,18 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isSolid = scrolled || !isHome;
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Services", href: "/services" },
-    { name: "Donations", href: "/donations" },
   ];
 
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled
+        isSolid
           ? "bg-white/90 backdrop-blur-md shadow-lg py-2"
           : "bg-transparent py-4"
       }`}
@@ -42,7 +46,7 @@ export default function Navbar() {
               />
               <span
                 className={`font-bold text-xl tracking-tight transition-colors ${
-                  scrolled ? "text-brand-green" : "text-white drop-shadow-md"
+                  isSolid ? "text-brand-green" : "text-white drop-shadow-md"
                 }`}
               >
                 Havering North Branch
@@ -55,7 +59,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`font-medium transition-colors hover:text-brand-gold ${
-                  scrolled ? "text-slate-700" : "text-white/90 drop-shadow-sm"
+                  isSolid ? "text-slate-700" : "text-white/90 drop-shadow-sm"
                 }`}
               >
                 {link.name}
@@ -72,7 +76,7 @@ export default function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className={`p-2 rounded-md ${
-                scrolled ? "text-brand-green" : "text-white"
+                isSolid ? "text-brand-green" : "text-white"
               } hover:bg-brand-green/10 transition-colors`}
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
