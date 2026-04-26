@@ -4,19 +4,52 @@ import { useState, useEffect } from "react";
 import { Clock, Calendar } from "lucide-react";
 
 export default function PrayerTable() {
-  // Placeholder for prayer times - in a real app, this would be fetched from an API like aladhan.com
   const [prayerTimes, setPrayerTimes] = useState([
-    { name: "Fajr", start: "04:30", jamaah: "04:45" },
-    { name: "Zuhr", start: "13:05", jamaah: "13:30" },
-    { name: "Asr", start: "17:15", jamaah: "17:45" },
-    { name: "Maghrib", start: "20:05", jamaah: "20:05" },
-    { name: "Isha", start: "21:30", jamaah: "21:45" },
+    { name: "Fajr", start: "--:--", jamaah: "--:--" },
+    { name: "Zuhr", start: "--:--", jamaah: "--:--" },
+    { name: "Asr", start: "--:--", jamaah: "--:--" },
+    { name: "Maghrib", start: "--:--", jamaah: "--:--" },
+    { name: "Isha", start: "--:--", jamaah: "--:--" },
   ]);
 
   const [currentTime, setCurrentTime] = useState("");
   const [currentDate, setCurrentDate] = useState("");
 
+  // Helper function to add minutes to a "HH:MM" string for Jama'ah times
+  const addMinutes = (timeStr, minsToAdd) => {
+    if (!timeStr || timeStr === "--:--") return "--:--";
+    const [h, m] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(h, m + minsToAdd, 0);
+    return date.toTimeString().slice(0, 5);
+  };
+
   useEffect(() => {
+    // Fetch live prayer times
+    const fetchPrayerTimes = async () => {
+      try {
+        const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=London&country=UK');
+        const data = await res.json();
+        
+        if (data && data.code === 200) {
+          const timings = data.data.timings;
+          
+          // Applying standard offsets for Jama'ah (congregation) times based on start times.
+          setPrayerTimes([
+            { name: "Fajr", start: timings.Fajr, jamaah: addMinutes(timings.Fajr, 15) },
+            { name: "Zuhr", start: timings.Dhuhr, jamaah: addMinutes(timings.Dhuhr, 15) },
+            { name: "Asr", start: timings.Asr, jamaah: addMinutes(timings.Asr, 15) },
+            { name: "Maghrib", start: timings.Maghrib, jamaah: timings.Maghrib },
+            { name: "Isha", start: timings.Isha, jamaah: addMinutes(timings.Isha, 15) },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch prayer times:", error);
+      }
+    };
+
+    fetchPrayerTimes();
+
     const updateTime = () => {
       const now = new Date();
       setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
